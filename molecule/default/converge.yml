@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include sonobuoy"
+      include_role:
+        name: "sonobuoy"

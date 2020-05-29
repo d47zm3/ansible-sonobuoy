@@ -1,0 +1,3 @@
+---
+# defaults file for sonobuoy
+github_release: https://api.github.com/repos/vmware-tanzu/sonobuoy/releases/latest

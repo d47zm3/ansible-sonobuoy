@@ -1,0 +1,60 @@
+---
+- name: Make Sure JQ & CURL Are Installed
+  apt:
+    name: ['jq', 'curl']
+    state: present
+
+- name: Find Latest Sonobuoy Release
+  shell: >
+    set -o pipefail && \
+    curl --silent "https://api.github.com/repos/vmware-tanzu/sonobuoy/releases/latest" | jq -r ".tag_name"
+  args:
+    warn: false
+    executable: /bin/bash
+  register: latest_release
+  changed_when: false
+
+- name: Check If Sonobuoy Is Installed
+  stat:
+    path: /usr/local/bin/sonobuoy
+  register: binary_exists
+
+- name: Check Installed Sonobuoy Version
+  shell: >
+    set -o pipefail && \
+    sonobuoy version | grep -i "sonobuoy" | awk ' { print $NF } '
+  args:
+    executable: /bin/bash
+  register: sonobuoy_version
+  when: binary_exists.stat.exists
+  changed_when: false
+
+- name: Get Latest Release Link
+  shell: >
+    set -o pipefail && \
+    curl --silent "{{ github_release }}" | jq -r '.assets[].browser_download_url | select(. | contains("linux_amd64"))'
+  args:
+    warn: false
+    executable: /bin/bash
+  register: download_link
+  when: (not binary_exists.stat.exists) or (latest_release.stdout != sonobuoy_version.stdout)
+
+- name: Remove Old Version
+  file:
+    path: /usr/local/bin/sonobuoy
+    state: absent
+  when: (not binary_exists.stat.exists) or (latest_release.stdout != sonobuoy_version.stdout)
+
+- name: Download Latest Release
+  uri:
+    url: "{{ download_link.stdout }}"
+    dest: /tmp/sonobuoy.tar.gz
+    creates: /tmp/sonobuoy.tar.gz
+  when: (not binary_exists.stat.exists) or (latest_release.stdout != sonobuoy_version.stdout)
+
+- name: Install Sonobuoy
+  unarchive:
+    src: /tmp/sonobuoy.tar.gz
+    dest: /usr/local/bin
+    remote_src: true
+  when: (not binary_exists.stat.exists) or (latest_release.stdout != sonobuoy_version.stdout)
