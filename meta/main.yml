@@ -1,6 +1,7 @@
 ---
 galaxy_info:
   author: d47zm3
+  role_name: sonobuoy
   description: Sonobuoy - E2E Kubernetes Testing
   license: "license (BSD, MIT)"
 
@@ -13,5 +14,8 @@ galaxy_info:
 
   galaxy_tags:
     - kubernetes
+    - linux
+    - security
+    - e2e
 
 dependencies: []
