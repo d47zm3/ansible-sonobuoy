@@ -7,7 +7,7 @@
 - name: Find Latest Sonobuoy Release
   shell: >
     set -o pipefail && \
-    curl --silent "https://api.github.com/repos/vmware-tanzu/sonobuoy/releases/latest" | jq -r ".tag_name"
+    curl --silent "{{ github_release }}" | jq -r ".tag_name"
   args:
     warn: false
     executable: /bin/bash
@@ -57,4 +57,10 @@
     src: /tmp/sonobuoy.tar.gz
     dest: /usr/local/bin
     remote_src: true
+  when: (not binary_exists.stat.exists) or (latest_release.stdout != sonobuoy_version.stdout)
+
+- name: Cleanup
+  file:
+    path: /tmp/sonobuoy.tar.gz
+    state: absent
   when: (not binary_exists.stat.exists) or (latest_release.stdout != sonobuoy_version.stdout)

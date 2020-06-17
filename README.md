@@ -2,7 +2,6 @@
 
 ![](https://github.com/d47zm3/ansible-sonobuoy/workflows/YAML%20Lint/badge.svg)
 ![](https://github.com/d47zm3/ansible-sonobuoy/workflows/Ansible%20Lint/badge.svg)
-![](https://github.com/d47zm3/ansible-sonobuoy/workflows/Molecule/badge.svg)
 
 
 Sonobuoy
